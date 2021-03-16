@@ -1,0 +1,76 @@
+﻿@page
+@model IndexModel
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@{
+    ViewData["Title"] = "Home page";
+    var user = await UserManager.GetUserAsync(User);
+}
+
+        @if (SignInManager.IsSignedIn(User))
+        {
+                <form method="post" enctype="multipart/form-data">
+
+                    <label for="productname"> Produkt namn </label>
+                    <input type="text" name="productname" id="productname" />
+
+                    <label for="amount"> Antal </label>
+                    <input type="number" name="amount" id="amount" />
+
+                    <label for="bought"> Inköpt </label>
+                    <input type="checkbox" name="bought" id="bought" value="true" />
+
+                    <label for="bought"> Inte Köpt </label>
+                    <input type="checkbox" name="bought" id="bought" value="false" />
+
+                    <input type="submit" value="Spara inlägg" />
+
+                </form>
+        }
+        else
+        {
+            <h3>Du är inte inloggad</h3>
+        }
+
+
+    @if (SignInManager.IsSignedIn(User))
+    {
+        if (Model.Products is not null)
+        {
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+
+                        <th scope="col">Produkt ID</th>
+                        <th scope="col">Produkt namn</th>
+                        <th scope="col">Antal</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Köpt</th>
+                        <th scope="col">Ta bort</th>
+
+                    </tr>
+                </thead>
+
+                @foreach (var product in Model.Products)
+                {
+                    <tbody>
+                        <tr>
+                            <th scope="row">@product.ID</th>
+                            <td>@product.ProductName</td>
+                            <td>@product.Amount</td>
+                            <td>@{var message = product.Bought ? "Köpt" : "Inte köpt";} @message</td>
+                            <td><a href="?EditProductID=@product.ID" value="true"> Ändra </a></td>
+
+
+                            @if (user != null && user.Id == product.UserID)
+                            {
+                                <td><a href="?ProductDeleteID=@product.ID">Ta bort</a></td>
+                            }
+                        </tr>
+                    </tbody>
+
+                }
+            </table>
+            
+        }
+    }
